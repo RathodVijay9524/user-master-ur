@@ -1,12 +1,34 @@
 import PropTypes from 'prop-types';
+import { useEffect, useState } from 'react';
 import { Navigate } from 'react-router-dom';
 import { useSelector } from 'react-redux';
+import fetchCurrentUser from './fetchCurrentUser';
 
 const RoleBasedGuard = ({ children, requiredRole }) => {
-  const { token, user, loading } = useSelector(state => state.auth);
+  const { token } = useSelector(state => state.auth);
+  const [user, setUser] = useState(null);
+  const [loading, setLoading] = useState(true);
 
-  console.log('Token:', token);
-  console.log('User:', user);
+  useEffect(() => {
+    const getUserData = async () => {
+      if (token) {
+        try {
+          const userData = await fetchCurrentUser();
+          setUser(userData);
+        } catch (error) {
+          console.error('Error fetching user data:', error);
+        } finally {
+          setLoading(false);
+        }
+      } else {
+        setLoading(false);
+      }
+    };
+
+    getUserData();
+  }, [token]);
+
+
   console.log('Required Role:', requiredRole);
 
   if (loading) {
@@ -16,9 +38,8 @@ const RoleBasedGuard = ({ children, requiredRole }) => {
   const roleMatch = requiredRole && user?.roles.some(userRole => userRole.name === requiredRole);
 
   if (!token || !roleMatch) {
-    console.log('Redirecting to login');
     localStorage.removeItem('jwtToken'); // Optionally remove token
-    return <Navigate to="/login" />;
+    return <Navigate to="/" />;
   }
 
   return children;

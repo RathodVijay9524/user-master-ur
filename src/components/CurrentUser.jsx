@@ -1,10 +1,31 @@
-
+import { useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
+import fetchCurrentUser from '../redux/fetchCurrentUser';
 
 const CurrentUser = () => {
-  const { user } = useSelector(state => state.auth);
+  const [user, setUser] = useState(null);
+  const { token } = useSelector(state => state.auth);
 
-  // Check if user exists before rendering
+  console.log("token : ", token)
+
+  useEffect(() => {
+    const getUserData = async () => {
+      if (!user && token) {
+        try {
+          const userData = await fetchCurrentUser();
+          setUser(userData);
+        } catch (error) {
+          console.error('Error fetching user data:', error);
+        }
+      }
+    };
+
+    getUserData();
+  }, [user, token]);
+
+  // Log user data for debugging
+  console.log('CurrentUser component render - user:', user);
+
   if (!user) {
     return <p>No user logged in</p>;
   }

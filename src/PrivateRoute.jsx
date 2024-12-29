@@ -11,7 +11,7 @@ const PrivateRoute = ({ children, role }) => {
   // Check if the user is authenticated and has the required role
   if (!token || userRole !== role) {
     // Redirect to login if not authenticated or role doesn't match
-    return <Navigate to="/" />;
+    return <Navigate to="/login" />;
   }
 
   // If authenticated and role matches, render the children (protected route content)
