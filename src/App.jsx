@@ -8,7 +8,7 @@ import WorkerDashboard from './components/WorkerDashboard';
 import PrivateRoute from './PrivateRoute';
 import AdminHome from './components/BaseAdmin/AdminHome';
 import ActiveUser from './components/BaseAdmin/ActiveUser';
-import Login from './components/login'; // Ensure this path is correct
+import Login from './components/Login';
 
 function App() {
   return (
@@ -35,7 +35,7 @@ function App() {
             </PrivateRoute>
           }
         >
-          <Route path="" element={<UserDashboard />} />
+          <Route index element={<UserDashboard />} />
         </Route>
 
         <Route
@@ -46,7 +46,7 @@ function App() {
             </PrivateRoute>
           }
         >
-          <Route path="" element={<WorkerDashboard />} />
+          <Route index element={<WorkerDashboard />} />
         </Route>
 
         <Route path="/login" element={<Login />} />

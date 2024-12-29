@@ -6,6 +6,7 @@ import { login } from '../redux/authSlice';
 const Login = () => {
   const [usernameOrEmail, setUsernameOrEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [hasNavigated, setHasNavigated] = useState(false); // New state to track navigation
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const { loading, error, user } = useSelector(state => state.auth);
@@ -18,7 +19,6 @@ const Login = () => {
 
       if (result.meta.requestStatus === 'fulfilled') {
         const userRoles = result.payload.data.user.roles.map(role => role.name);
-
         console.log('User roles:', userRoles);
 
         if (userRoles.includes('ROLE_ADMIN')) {
@@ -39,22 +39,23 @@ const Login = () => {
   };
 
   useEffect(() => {
-    if (user) {
+    if (user && !hasNavigated) {
       const userRoles = user.roles.map(role => role.name);
-
       console.log('User roles from state:', userRoles);
 
       if (userRoles.includes('ROLE_ADMIN')) {
         navigate('/admin');
       } else if (userRoles.includes('ROLE_WORKER')) {
         navigate('/worker');
-      } else if (userRoles.includes('ROLE_USER') || userRoles.includes('ROLE_NORMAL')) {
+      } else if (userRoles.includes('ROLE_NORMAL')) {
         navigate('/user');
       } else {
         console.error('No matching role found.');
       }
+
+      setHasNavigated(true); // Set navigation to true after navigation
     }
-  }, [user, navigate]);
+  }, [user, navigate, hasNavigated]);
 
   return (
     <div>

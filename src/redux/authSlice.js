@@ -1,9 +1,9 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
-import axios from 'axios';
+import axiosInstance from './axiosInstance'; // Import Axios instance with interceptors
 
 export const login = createAsyncThunk('auth/login', async (credentials, { rejectWithValue }) => {
   try {
-    const response = await axios.post('http://localhost:9091/api/auth/login', credentials);
+    const response = await axiosInstance.post('/auth/login', credentials);
     localStorage.setItem('jwtToken', response.data.data.jwtToken);
     console.log('jwtToken : ', response.data.data.jwtToken);
     return response.data;
@@ -36,7 +36,7 @@ const authSlice = createSlice({
       .addCase(login.fulfilled, (state, action) => {
         state.loading = false;
         state.user = action.payload.data.user;
-        console.log('User set in state: ', state.user); // Add logging here
+        console.log('User set in state: ', state.user);
         state.token = action.payload.data.jwtToken;
       })
       .addCase(login.rejected, (state, action) => {
