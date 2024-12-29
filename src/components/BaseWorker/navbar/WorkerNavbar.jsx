@@ -1,8 +1,13 @@
+import Logout from "../../Logout"
 
 
 const WorkerNavbar = () => {
   return (
-    <div>WorkerNavbar</div>
+    <>
+      <div>WorkerNavbar</div>
+      <Logout />
+    </>
+
   )
 }
 
