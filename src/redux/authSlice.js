@@ -13,9 +13,13 @@ export const login = createAsyncThunk('auth/login', async (credentials, { reject
 
 export const fetchUserData = createAsyncThunk('auth/fetchUserData', async (_, { rejectWithValue }) => {
   try {
-    const response = await axiosInstance.get('/auth/current-user'); // Adjust endpoint as necessary
-    //console.log("crrunt user request - ",response.data)
-    localStorage.setItem('jwtToken', response.data.data.jwtToken);
+    const token = localStorage.getItem('jwtToken'); // Get token from localStorage
+    if (!token) {
+      throw new Error('No token found in localStorage');
+    }
+    const response = await axiosInstance.get('/auth/current-user', {
+      headers: { Authorization: `Bearer ${token}` }
+    });
     return response.data;
   } catch (error) {
     return rejectWithValue(error.response.data);
@@ -28,14 +32,15 @@ const authSlice = createSlice({
     user: null,
     token: localStorage.getItem('jwtToken') || null,
     loading: false,
-    error: null
+    error: null,
   },
   reducers: {
     logout: (state) => {
       state.user = null;
       state.token = null;
+      state.loading = false; // Reset loading state
       localStorage.removeItem('jwtToken');
-    }
+    },
   },
   extraReducers: (builder) => {
     builder
@@ -45,8 +50,10 @@ const authSlice = createSlice({
       })
       .addCase(login.fulfilled, (state, action) => {
         state.loading = false;
-        state.user = action.payload.data.user;
-        state.token = action.payload.data.jwtToken;
+        if (action.payload && action.payload.data && action.payload.data.user) {
+          state.user = action.payload.data.user;
+          state.token = action.payload.data.jwtToken;
+        }
       })
       .addCase(login.rejected, (state, action) => {
         state.loading = false;
@@ -58,13 +65,15 @@ const authSlice = createSlice({
       })
       .addCase(fetchUserData.fulfilled, (state, action) => {
         state.loading = false;
-        state.user = action.payload.data.user;
+        if (action.payload && action.payload.data && action.payload.data.user) {
+          state.user = action.payload.data.user;
+        }
       })
       .addCase(fetchUserData.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload ? action.payload : { errorMessage: 'Failed to fetch user data' };
       });
-  }
+  },
 });
 
 export const { logout } = authSlice.actions;

@@ -71,7 +71,7 @@ function App() {
 
         {/* Login and Default Route */}
 
-        <Route path="/" element={<Login />} />
+        <Route path="/login" element={<Login />} />
       </Routes>
     </Router>
   );
