@@ -39,6 +39,7 @@ const RoleBasedGuard = ({ children, requiredRole }) => {
 
   if (!token || !roleMatch) {
     localStorage.removeItem('jwtToken'); // Optionally remove token
+    localStorage.removeItem('user');
     return <Navigate to="/login" />;
   }
 

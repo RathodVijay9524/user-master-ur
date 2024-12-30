@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { useNavigate } from 'react-router-dom';
-import { login, fetchUserData, setUser } from '../redux/authSlice';
+import { useNavigate, Link } from 'react-router-dom';
+import { login, fetchUserData, setUser } from '../../redux/authSlice';
 import 'bootstrap/dist/css/bootstrap.min.css';
 
 const Login = () => {
@@ -45,7 +45,6 @@ const Login = () => {
     }
   };
 
-  // Setup user from local storage if available on page load
   useEffect(() => {
     const savedUser = localStorage.getItem('user');
     if (savedUser) {
@@ -55,31 +54,40 @@ const Login = () => {
 
   return (
     <div className="container mt-5">
-      {error && <p className="text-danger">{error.errorMessage}</p>}
-      <h2 className="text-center">Login</h2>
-      <form onSubmit={handleSubmit}>
-        <div className="form-group">
-          <label>Username or Email:</label>
-          <input
-            type="text"
-            className="form-control"
-            value={usernameOrEmail}
-            onChange={(e) => setUsernameOrEmail(e.target.value)}
-          />
+      <div className="row justify-content-center">
+        <div className="col-md-6">
+          <div className="card shadow p-4">
+            <h2 className="card-title text-center mb-4">Login</h2>
+            {error && <p className="text-danger">{error.errorMessage}</p>}
+            <form onSubmit={handleSubmit}>
+              <div className="form-group">
+                <label>Username or Email:</label>
+                <input
+                  type="text"
+                  className="form-control"
+                  value={usernameOrEmail}
+                  onChange={(e) => setUsernameOrEmail(e.target.value)}
+                />
+              </div>
+              <div className="form-group">
+                <label>Password:</label>
+                <input
+                  type="password"
+                  className="form-control"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                />
+              </div>
+              <button type="submit" className="btn btn-primary btn-block mt-3" disabled={loading}>
+                {loading ? 'Logging in...' : 'Login'}
+              </button>
+            </form>
+            <div className="mt-4 text-center">
+              Dont have an account? <Link to="/">Register here</Link>
+            </div>
+          </div>
         </div>
-        <div className="form-group">
-          <label>Password:</label>
-          <input
-            type="password"
-            className="form-control"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-          />
-        </div>
-        <button type="submit" className="btn btn-primary" disabled={loading}>
-          {loading ? 'Logging in...' : 'Login'}
-        </button>
-      </form>
+      </div>
     </div>
   );
 };
