@@ -1,7 +1,7 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
-import { login, fetchUserData } from '../redux/authSlice';
+import { login, fetchUserData, setUser } from '../redux/authSlice';
 import 'bootstrap/dist/css/bootstrap.min.css';
 
 const Login = () => {
@@ -22,6 +22,8 @@ const Login = () => {
 
         const user = result.payload && result.payload.data && result.payload.data.user;
         if (user) {
+          localStorage.setItem('user', JSON.stringify(user)); // Set user in local storage
+
           const userRoles = user.roles.map(role => role.name);
           console.log('User roles:', userRoles);
 
@@ -42,6 +44,14 @@ const Login = () => {
       console.error('Error during login:', error);
     }
   };
+
+  // Setup user from local storage if available on page load
+  useEffect(() => {
+    const savedUser = localStorage.getItem('user');
+    if (savedUser) {
+      dispatch(setUser(JSON.parse(savedUser)));
+    }
+  }, [dispatch]);
 
   return (
     <div className="container mt-5">
