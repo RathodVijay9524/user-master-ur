@@ -1,7 +1,8 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import axios from 'axios';
+import axiosInstance from '../../redux/axiosInstance';
 import 'bootstrap/dist/css/bootstrap.min.css';
+import checkAvailability from '../../service/user-service';
 
 const UserRegistration = () => {
   const [user, setUser] = useState({
@@ -15,6 +16,8 @@ const UserRegistration = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [success, setSuccess] = useState(null);
+  const [usernameAvailable, setUsernameAvailable] = useState(null); // Changed initial state to null
+  const [emailAvailable, setEmailAvailable] = useState(null); // Changed initial state to null
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -22,6 +25,13 @@ const UserRegistration = () => {
       ...prevUser,
       [name]: value,
     }));
+
+    if (name === 'username') {
+      setUsernameAvailable(null); // Reset availability state
+    }
+    if (name === 'email') {
+      setEmailAvailable(null); // Reset availability state
+    }
   };
 
   const handleSubmit = async (e) => {
@@ -29,7 +39,7 @@ const UserRegistration = () => {
     setLoading(true);
 
     try {
-      const response = await axios.post('/v1/users/register', user);
+      const response = await axiosInstance.post('/auth/register/admin', user);  // Ensure correct endpoint
       setLoading(false);
       setSuccess(response.data);
       setError(null);
@@ -50,7 +60,35 @@ const UserRegistration = () => {
     });
     setError(null);
     setSuccess(null);
+    setUsernameAvailable(null);
+    setEmailAvailable(null);
   };
+
+  const checkUsernameAvailability = async () => {
+    if (user.username) {
+      console.log('Checking username availability:', user.username);
+      const exists = await checkAvailability(user.username);
+      console.log('Username exists:', exists);
+      setUsernameAvailable(!exists); // Set to true if available, false if taken
+    }
+  };
+
+  const checkEmailAvailability = async () => {
+    if (user.email) {
+      console.log('Checking email availability:', user.email);
+      const exists = await checkAvailability(user.email);
+      console.log('Email exists:', exists);
+      setEmailAvailable(!exists); // Set to true if available, false if taken
+    }
+  };
+
+  useEffect(() => {
+    console.log('Username Available State:', usernameAvailable);
+  }, [usernameAvailable]);
+
+  useEffect(() => {
+    console.log('Email Available State:', emailAvailable);
+  }, [emailAvailable]);
 
   return (
     <div className="container mt-5">
@@ -79,7 +117,18 @@ const UserRegistration = () => {
                   name="username"
                   value={user.username}
                   onChange={handleChange}
+                  onBlur={checkUsernameAvailability}
                 />
+                {usernameAvailable === false && (
+                  <p className="text-danger">
+                    Username already exists! Choose another username.
+                  </p>
+                )}
+                {usernameAvailable === true && (
+                  <p className="text-success">
+                    Username is available
+                  </p>
+                )}
               </div>
               <div className="form-group">
                 <label>Email:</label>
@@ -89,7 +138,18 @@ const UserRegistration = () => {
                   name="email"
                   value={user.email}
                   onChange={handleChange}
+                  onBlur={checkEmailAvailability}
                 />
+                {emailAvailable === false && (
+                  <p className="text-danger">
+                    Email already exists! Choose another email.
+                  </p>
+                )}
+                {emailAvailable === true && (
+                  <p className="text-success">
+                    Email is available
+                  </p>
+                )}
               </div>
               <div className="form-group">
                 <label>Password:</label>
@@ -115,7 +175,7 @@ const UserRegistration = () => {
                 <button type="submit" className="btn btn-primary mt-3" disabled={loading}>
                   {loading ? 'Registering...' : 'Register'}
                 </button>
-                <button type="button" className="btn btn-secondary mt-1" onClick={handleReset}>
+                <button type="button" className="btn btn-secondary mt-3" onClick={handleReset}>
                   Reset
                 </button>
               </div>
