@@ -13,7 +13,7 @@ export const login = createAsyncThunk('auth/login', async (credentials, { reject
 
 export const fetchUserData = createAsyncThunk('auth/fetchUserData', async (_, { rejectWithValue }) => {
   try {
-    const token = localStorage.getItem('jwtToken'); // Get token from localStorage
+    const token = localStorage.getItem('jwtToken');
     if (!token) {
       throw new Error('No token found in localStorage');
     }
@@ -40,6 +40,10 @@ const authSlice = createSlice({
       state.token = null;
       state.loading = false; // Reset loading state
       localStorage.removeItem('jwtToken');
+      localStorage.removeItem('user');
+    },
+    setUser: (state, action) => {
+      state.user = action.payload;
     },
   },
   extraReducers: (builder) => {
@@ -76,5 +80,5 @@ const authSlice = createSlice({
   },
 });
 
-export const { logout } = authSlice.actions;
+export const { logout, setUser } = authSlice.actions;
 export default authSlice.reducer;
