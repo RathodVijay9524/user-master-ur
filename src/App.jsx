@@ -11,9 +11,10 @@ import WorkerDashboard from './components/WorkerDashboard';
 import AdminHome from './components/BaseAdmin/AdminHome';
 import ActiveUser from './components/BaseAdmin/ActiveUser';
 import CurrentUser from './components/CurrentUser';
-import Login from './components/Login';
+import Login from './components/public/login';
 import { fetchUserData } from './redux/authSlice';
 import RoleBasedGuard from './redux/RoleBasedGuard';
+import UserRegistration from './components/public/UserRegistration';
 
 function App() {
   const dispatch = useDispatch();
@@ -72,6 +73,7 @@ function App() {
         {/* Login and Default Route */}
 
         <Route path="/login" element={<Login />} />
+        <Route path="/" element={<UserRegistration />} />
       </Routes>
     </Router>
   );

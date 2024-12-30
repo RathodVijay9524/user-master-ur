@@ -1,4 +1,4 @@
-import Logout from "../../Logout"
+import Logout from "../../public/Logout"
 
 
 const WorkerNavbar = () => {
